@@ -38,10 +38,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         // Set the background frame color
         GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);  //设置清空屏幕用的颜色,设置背景底色
 
-        int vertextShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-        GLES20.glShaderSource(vertextShader,VERTEX_SHADER);
-        GLES20.glCompileShader(vertextShader);
-
         /**
          * shader
          * GL ES 2.0与1.0版本最大的区别在于，把渲染相关的操作用一个专门的叫作着色语言的程序来表达，全名叫作OpenGL ES Shading language，它是一个编程语言，与C语言非常类似，
@@ -51,13 +47,21 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
          * 来表达不同的着色方案。
          *
          */
-        int fragmentShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-        GLES20.glShaderSource(fragmentShader,FRAGMENT_SHADER);
-        GLES20.glCompileShader(fragmentShader);
+
+
+       // 得到一个着色器的ID
+        int vertextShaderId = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
+        GLES20.glShaderSource(vertextShaderId,VERTEX_SHADER);
+        GLES20.glCompileShader(vertextShaderId);
+
+        // 得到一个着色器的ID
+        int fragmentShaderId = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
+        GLES20.glShaderSource(fragmentShaderId,FRAGMENT_SHADER);
+        GLES20.glCompileShader(fragmentShaderId);
 
         mGLProgram = GLES20.glCreateProgram(); //创建shader program 句柄
-        GLES20.glAttachShader(mGLProgram,vertextShader); // 把vertex shader添加到program
-        GLES20.glAttachShader(mGLProgram,fragmentShader);// 把fragment shader添加到program
+        GLES20.glAttachShader(mGLProgram,vertextShaderId); // 把vertex shader添加到program
+        GLES20.glAttachShader(mGLProgram,fragmentShaderId);// 把fragment shader添加到program
         GLES20.glLinkProgram(mGLProgram);// 做链接，可以理解为把两种shader进行融合，做好投入使用的最后准备工作
 
 
