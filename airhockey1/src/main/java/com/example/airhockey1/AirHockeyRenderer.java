@@ -6,7 +6,6 @@ import android.opengl.GLSurfaceView;
 import com.example.airhockey1.util.LoggerConfig;
 import com.example.airhockey1.util.ShaderHelper;
 import com.example.airhockey1.util.TextResourceReader;
-import com.example.camera.R;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

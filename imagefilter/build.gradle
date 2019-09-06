@@ -6,8 +6,8 @@ android {
 
 
     defaultConfig {
-        applicationId "com.example.airhockey1"
-        minSdkVersion 19
+        applicationId "com.example.imagefilter"
+        minSdkVersion 28
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -17,19 +17,9 @@ android {
     }
 
     buildTypes {
-
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            manifestPlaceholders = [PACKAGE_NAME      : "com.example.camera"]
-        }
-
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            manifestPlaceholders = [PACKAGE_NAME      : "com.example.camera"]
         }
     }
 

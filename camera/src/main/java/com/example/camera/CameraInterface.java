@@ -7,17 +7,20 @@ import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+
 public class CameraInterface {
     private Camera mCamera;
     private Camera.Parameters mParams;
     private boolean isPreviewing = false;
     private static CameraInterface mCameraInterface;
+    private static final String TAG = CameraInterface.class.getSimpleName();
 
     private CameraInterface() {
     }
@@ -95,6 +98,7 @@ public class CameraInterface {
             isPreviewing = true;
         }
     }
+
     //如果这个参数设置为Null,将没有卡擦的声音
     Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback()
 
@@ -104,8 +108,7 @@ public class CameraInterface {
     };
 
     //对jpeg图像数据的回调,最重要的一个回调
-    Camera.PictureCallback mJpegPictureCallback = new Camera.PictureCallback()
-    {
+    Camera.PictureCallback mJpegPictureCallback = new Camera.PictureCallback() {
         public void onPictureTaken(byte[] data, Camera camera) {
             Bitmap b = null;
             if (null != data) {
@@ -134,17 +137,17 @@ public class CameraInterface {
     }
 
     private static String initPath() {
-        String storagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "PlayCamera";
+        String storagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/PlayCamera/photo/";
         File f = new File(storagePath);
-        if (!f.exists()) {
-            f.mkdir();
+        if (!f.exists() && !f.mkdirs()) {
+            Log.e(TAG, "无法保存照片");
         }
         return storagePath;
     }
 
     private void saveBitmap(Bitmap b) {
         String path = initPath();
-        String jpegName = path + "/" + System.currentTimeMillis() + ".jpg";
+        String jpegName = path + System.currentTimeMillis() + ".jpg";
         try {
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(jpegName));
             b.compress(Bitmap.CompressFormat.JPEG, 100, bos);
