@@ -14,29 +14,17 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * OpenGL 入门学习 https://yq.aliyun.com/articles/118206?spm=a2c4e.11153940.0.0.28231bbdHNBCF9
  */
-public class Renderer1 implements GLSurfaceView.Renderer {
+public class Renderer2 implements GLSurfaceView.Renderer {
 
     private Context mContext;
     private final FloatBuffer vertexData;
-    private int point_dimission = 2; //有多少个分量与每一个顶点相关联。点数据的维度，我们这里只定义了二维。但是在着色器是我们用的是vec4四维，如果一个维度没有赋值，OpenGL会把前三个rgb设置为0，最后一个透明度设置为1
+    private int point_dimission = 3; //有多少个分量与每一个顶点相关联。点数据的维度，我们这里只定义了二维。但是在着色器是我们用的是vec4四维，如果一个维度没有赋值，OpenGL会把前三个rgb设置为0，最后一个透明度设置为1
     private float[] pointsArray = {
             // Triangle 1
-            -0.5f, -0.5f,
-            0.5f, 0.5f,
-            -0.5f, 0.5f,
-            // Triangle 2
-            -0.5f, -0.5f,
-            0.5f, -0.5f,
-            0.5f, 0.5f,
-            // Line 1
-            -0.5f, 0f,
-            0.5f, 0f,
-            // Mallets
-            0f, -0.25f,
-            0f, 0.25f,
+            0.0f, 0.25f, 0.1f,
+            -0.5f, -0.25f, 0.2f,
+            0.5f, -0.25f, 0.3f,
 
-            //Point  中心处画一个点
-            0f, 0f
     };
     private int uColorLocation;
     private int aPositionLocation;
@@ -44,13 +32,13 @@ public class Renderer1 implements GLSurfaceView.Renderer {
 
     /**
      * 我们在Android上使用Java进行编码，但OpengGL ES 2底层实现其实使用C语言编写的。在我们将数据传递给OpenGL之前，
-     *我们需要将其转换成它能理解的形式。Java和native系统可能不会以相同的顺序存储它们的字节，因此我们使用一个特殊
+     * 我们需要将其转换成它能理解的形式。Java和native系统可能不会以相同的顺序存储它们的字节，因此我们使用一个特殊
      * 的缓冲类并创建一个足够大的ByteBuffer来保存我们的数据，并告诉它使用native字节顺序存储数据。然后我们将它转换
      * 成FloatBuffer，以便我们可以使用它来保存浮点数据。最后，我们将数组复制到缓冲区。
      *
      * @param context
      */
-    public Renderer1(Context context) {
+    public Renderer2(Context context) {
         mContext = context;
 
         //// 初始化缓冲区,申请一块本地内存（不是虚拟机的空间,不会被divaik虚拟机回收）存放我们的数据
@@ -66,7 +54,7 @@ public class Renderer1 implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         //获取OpenGl 着色代码 点着色器，片着色器
         String vertexShader = ReadGLSLHelper.ReadGLSL(mContext, "simple_vertex_shader.glsl");  //点着色器，控制点的位置
@@ -112,11 +100,13 @@ public class Renderer1 implements GLSurfaceView.Renderer {
 
         //告诉OpenGL从这个缓冲区中读取数据之前，需要确保它会从开头处开始读取数据，而不是中间或者结尾处。
         vertexData.position(0);
+
+        //对于attribute类型的变量，我们需要先enable，再赋值
+        GLES20.glEnableVertexAttribArray(aPositionLocation);
+
         //绑定顶点数据vertextData到着色器的a_Position变量
         GLES20.glVertexAttribPointer(aPositionLocation, point_dimission, GLES20.GL_FLOAT, false, 0, vertexData);
 
-        //enable顶点数据
-        GLES20.glEnableVertexAttribArray(aPositionLocation);
 
     }
 
@@ -125,39 +115,15 @@ public class Renderer1 implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, width, height);
     }
 
-    /**
-     * glClearColor()-设置清空屏幕用的颜色，接收四个参数分别是：红色、绿色、蓝色和透明度分量，0表示透明，1.0f相反；
-     *
-     * glClear()-清空屏幕，清空屏幕后调用glClearColor(）中设置的颜色填充屏幕；
-     *
-     * glViewport()-设置视图的尺寸，这就告诉了OpenGL可以用来渲染surface的大小
-     *
-     *
-     * @param gl
-     */
     @Override
     public void onDrawFrame(GL10 gl) {
         //绘制图形
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         //画两个三角形
-        GLES20.glUniform4f(uColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+        GLES20.glUniform4f(uColorLocation, 0.28f, 0.6f, 1.0f, 0.1f);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
 
-        //画两个三角形
-        GLES20.glUniform4f(uColorLocation, 0.0f, 1.0f, 1.0f, 1.0f);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 3, 5);
-
-        GLES20.glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
-        GLES20.glDrawArrays(GLES20.GL_LINES, 6, 2);
-
-        GLES20.glUniform4f(uColorLocation,0.8f,1.0f,0.3f,1.0f);
-        GLES20.glDrawArrays(GLES20.GL_POINTS,8,1);
-
-        GLES20.glUniform4f(uColorLocation,1.0f,0.3f,0.3f,0.8f);
-        GLES20.glDrawArrays(GLES20.GL_POINTS,9,1);
-
-        GLES20.glUniform4f(uColorLocation,0.0f,0.8f,0.3f,0.8f);
-        GLES20.glDrawArrays(GLES20.GL_POINTS,10,1);
+        GLES20.glDisable(aPositionLocation);
     }
 }
