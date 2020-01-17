@@ -4,7 +4,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
 import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL;
 import javax.microedition.khronos.opengles.GL10;
 
 public class MyGLRenderer implements GLSurfaceView.Renderer {
@@ -16,11 +15,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
      * gl_Position是一个内置变量，用于指定顶点，它是一个点，三维空间的点，所以用一个四维向量来赋值。vec4是四维向量的类型，vec4()是它的构造方法。等等，三维空间，
      * 不是（x, y, z）三个吗？咋用vec4呢？四维是叫做齐次坐标，它的几何意义仍是三维，先了解这么多，记得对于2D的话，第四位永远传1.0就可以了。这里，是指定原点
      * (0, 0, 0)作为顶点，就是说想在原点（正中心）位置画一个点。gl_PointSize是另外一个内置变量，用于指定点的大小。这个shader就是想在原点画一个尺寸为20的点
-     *
-     * 作者：alexhilton
-     * 链接：https://www.jianshu.com/p/d483cae905a8
-     * 来源：简书
-     * 简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。
      */
     private String VERTEX_SHADER =
             "void main() {\n" +
@@ -49,32 +43,83 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
          */
 
 
-       // 得到一个着色器的ID
+        /**
+         *
+         *  创建一个着色器分三步：
+         *
+         * 1) 创建Shader对象
+         *
+         * 2) 装载Shader源码
+         *
+         * 3) 编译Shader
+         */
+
+        /**
+         * 1）glCreateShader
+         * 它创建一个空的shader对象，它用于维护用来定义shader的源码字符串。支持以下两种shader:
+         * （1） GL_VERTEX_SHADER: 它运行在可编程的“顶点处理器”上，用于代替固定功能的顶点处理；
+         * （2） GL_FRAGMENT_SHADER: 它运行在可编程的“片断处理器”上，用于代替固定功能的片段处理；
+         */
         int vertextShaderId = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-        GLES20.glShaderSource(vertextShaderId,VERTEX_SHADER);
+
+        /**
+         * 2）glShaderSource装载源码：
+         * shader对象中原来的源码全部被新的源码所代替。
+         */
+        GLES20.glShaderSource(vertextShaderId, VERTEX_SHADER);
+
+        /**
+         * 3）glCompileShader
+         * 编译存储在shader对象中的源码字符串，编译结果被当作shader对象状态的一部分被保存起来，可通过
+         * glGetShaderiv函数获取编译状态。
+         */
         GLES20.glCompileShader(vertextShaderId);
 
-        // 得到一个着色器的ID
+        // 创建一个片着色器，三个步骤介绍同上
         int fragmentShaderId = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-        GLES20.glShaderSource(fragmentShaderId,FRAGMENT_SHADER);
+        GLES20.glShaderSource(fragmentShaderId, FRAGMENT_SHADER);
         GLES20.glCompileShader(fragmentShaderId);
 
-        mGLProgram = GLES20.glCreateProgram(); //创建shader program 句柄
-        GLES20.glAttachShader(mGLProgram,vertextShaderId); // 把vertex shader添加到program
-        GLES20.glAttachShader(mGLProgram,fragmentShaderId);// 把fragment shader添加到program
-        GLES20.glLinkProgram(mGLProgram);// 做链接，可以理解为把两种shader进行融合，做好投入使用的最后准备工作
+        //建立一个空的program对象，shader对象可以被连接到program对像
+        mGLProgram = GLES20.glCreateProgram();
+
+        // 把vertex shader添加到program
+        GLES20.glAttachShader(mGLProgram, vertextShaderId);
+
+        // 把fragment shader添加到program
+        GLES20.glAttachShader(mGLProgram, fragmentShaderId);
+
+        // 做链接，可以理解为把两种shader进行融合，做好投入使用的最后准备工作
+        GLES20.glLinkProgram(mGLProgram);
 
 
+    }
+
+    /**
+     * 提取一个方法用来定义着色器
+     * @param type
+     * @param shaderCode
+     * @return
+     */
+    public int loadShader(int type, String shaderCode) {
+        int shaderId = GLES20.glCreateShader(type);
+        GLES20.glShaderSource(shaderId, shaderCode);
+        GLES20.glCompileShader(shaderId);
+
+        return shaderId;
     }
 
     public void onDrawFrame(GL10 unused) {
         // Redraw background color
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);  //擦除屏幕上的所有颜色，并用 glClearColor 中的颜色填充整个屏幕,因为我们要开始新一帧的绘制了，所以先清理，以免有脏数据。
         GLES20.glUseProgram(mGLProgram); // 告诉OpenGL，使用我们在onSurfaceCreated里面准备好了的shader program来渲染
-        GLES20.glDrawArrays(GLES20.GL_POINTS,0,1); // 开始渲染，发送渲染点的指令， 第二个参数是offset，第三个参数是点的个数。目前只有一个点，所以是1。
+
+        // 开始渲染，发送渲染点的指令， 第二个参数是offset，第三个参数是点的个数。目前只有一个点，所以是1。
+        GLES20.glDrawArrays(GLES20.GL_POINTS, 0, 1);
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {  //设置了视口尺寸，告诉 OpenGL 可以用来渲染的 surface 的大小。
+        //设置视口
         GLES20.glViewport(0, 0, width, height);//（0, 0）是左上角，然后是width和heigh
 
     }

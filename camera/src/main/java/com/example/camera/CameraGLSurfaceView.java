@@ -37,7 +37,7 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
         mContext = context;
         setEGLContextClientVersion(2);
         setRenderer(this);
-        //根据纹理层的监听，有数据就绘制
+        //根据纹理层的监听，有数据就绘制。正因是RENDERMODE_WHEN_DIRTY所以就要告诉GLSurfaceView什么时候Render，也就是啥时候进到onDrawFrame()这个函数里。
         setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 

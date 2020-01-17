@@ -4,9 +4,9 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+
 public class OpenGLES20Activity extends AppCompatActivity {
     private GLSurfaceView glView;
-    private boolean rendererSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
