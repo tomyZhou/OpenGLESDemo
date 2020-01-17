@@ -1,1 +1,4 @@
-这个项目放自己动手写的OpengGL代码
+# OpenGLESDemo
+Android OpenGL ES 2.0教程
+
+更多学习请见：https://github.com/lanshifu/OpenGLDemo
