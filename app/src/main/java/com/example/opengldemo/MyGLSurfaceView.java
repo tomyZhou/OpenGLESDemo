@@ -11,7 +11,7 @@ import android.opengl.GLSurfaceView;
  */
 public class MyGLSurfaceView extends GLSurfaceView {
 
-    private final MyGLRenderer renderer;
+    private final MyGLRender3 renderer;
 
     public MyGLSurfaceView(Context context){
         super(context);
@@ -19,7 +19,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
         // 声明你使用的是OpenGlES2.0的API
         setEGLContextClientVersion(2);
 
-        renderer = new MyGLRenderer();
+        renderer = new MyGLRender3();
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);
